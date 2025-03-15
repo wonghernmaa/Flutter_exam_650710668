@@ -1,111 +1,170 @@
 import 'package:flutter/material.dart';
-import 'package:final_exam_650710668/widget/profile_card.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MaterialApp(
+    home: RegistrationForm(),
+  ));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
+class RegistrationForm extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const ProfileScreen(),
-    );
-  }
+  _RegistrationFormState createState() => _RegistrationFormState();
 }
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+class _RegistrationFormState extends State<RegistrationForm> {
+  final _formKey = GlobalKey<FormState>();
+
+  String fullName = '';
+  String email = '';
+  String gender = 'Male';
+  String province = 'Bangkok';
+  bool acceptTerms = false;
+
+  final List<String> provinces = [
+    'Bangkok',
+    'Chiang Mai',
+    'Phuket',
+    'Khon Kaen',
+    'Chonburi'
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile Card',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
-      ),
-      body: Container(
-        padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.deepPurple.shade300, Colors.deepPurple.shade800],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+      appBar: AppBar(title: Text("คำนวณค่าจัดส่ง")),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              SizedBox(height: 20),
+
+              Text("น้ำหนักสินค้า (กก.):",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              TextFormField(
+                decoration: const InputDecoration(
+                  hintText: 'น้ำหนักสินค้า',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(width: 2.0),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'กรุณาใส่น้ำหนักสินค้า';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  print(value);
+                },
+              ), // Full Name
+
+              SizedBox(height: 20),
+
+              Text("เลือกระยะทาง:",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              DropdownButtonFormField(
+                value: province,
+                items: provinces.map((String item) {
+                  return DropdownMenuItem(
+                    value: item,
+                    child: Text(item),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    province = value.toString();
+                  });
+                },
+              ),
+              Text("บริการเสริม:",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              CheckboxListTile(
+                title: Text("แพ็กกิ้งพิเศษ (+20 บาท)"),
+                value: acceptTerms,
+                onChanged: (value) {
+                  setState(() {
+                    acceptTerms = value!;
+                  });
+                },
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+
+              CheckboxListTile(
+                title: Text("ประกันพัสดุ (+50 บาท)"),
+                value: acceptTerms,
+                onChanged: (value) {
+                  setState(() {
+                    acceptTerms = value!;
+                  });
+                },
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+
+              SizedBox(height: 20),
+
+              // Gender Selection
+              Text("Gender",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Row(
+                children: [
+                  Radio(
+                    value: "Male",
+                    groupValue: gender,
+                    onChanged: (value) {
+                      setState(() {
+                        gender = value.toString();
+                      });
+                    },
+                  ),
+                  Text("ปกติ"),
+                  SizedBox(width: 20),
+                  Radio(
+                    value: "Female",
+                    groupValue: gender,
+                    onChanged: (value) {
+                      setState(() {
+                        gender = value.toString();
+                      });
+                    },
+                  ),
+                  Text("ด่วน"),
+                  Radio(
+                    value: "Female",
+                    groupValue: gender,
+                    onChanged: (value) {
+                      setState(() {
+                        gender = value.toString();
+                      });
+                    },
+                  ),
+                  Text("ด่วนพิเศษ"),
+                ],
+              ),
+
+              SizedBox(height: 20),
+
+              SizedBox(height: 20),
+
+              // Submit Button
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate() && acceptTerms) {
+                    _formKey.currentState!.save();
+                    print(
+                        "Name: $fullName, Email: $email, Gender: $gender, Province: $province");
+                  }
+                },
+                child: Text("คำนวณราคา"),
+              ),
+            ],
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ProfileCard(
-              name: 'Krissada Khongkaew',
-              position: 'Professor',
-              email: 'thepon4444@egmail.com',
-              phoneNumber: '098-746-3800',
-              imageUrl:
-                  'https://scontent.fbkk13-2.fna.fbcdn.net/v/t39.30808-6/481768540_122144629076502717_5660007276847633558_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=dKAhcV_w1RIQ7kNvgFnIzgp&_nc_oc=AdhqFXRFRWAtp1vsQ_RMzaYfHROtliqWj39D8BMnr-qRFEsg36FaWJd7FNrRIoIW1YQ&_nc_zt=23&_nc_ht=scontent.fbkk13-2.fna&_nc_gid=H4zL3_gF1b5ILvxSsrIpEQ&oh=00_AYEzIwUU2cNlR6N6O1xBFPNOsU93T_9f15ijt5NKvK8d7w&oe=67DAA35E',
-            ),
-            const SizedBox(height: 20),
-            _buildStatBar('HP', 0.90, Colors.red, Colors.redAccent),
-            const SizedBox(height: 10),
-            _buildStatBar('Mana', 0.5, Colors.blue, Colors.lightBlueAccent),
-          ],
-        ),
       ),
-    );
-  }
-
-  Widget _buildStatBar(
-      String label, double value, Color startColor, Color endColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '$label: ${(value * 100).toInt()}%',
-          style:
-              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 5),
-        Stack(
-          children: [
-            // แถบสีพื้นหลัง
-            Container(
-              height: 20,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade800,
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            // แถบ Progress ที่เป็น Gradient
-            FractionallySizedBox(
-              widthFactor: value, // ปรับขนาดตามค่าที่กำหนด (0.75 = 75%)
-              child: Container(
-                height: 20,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  gradient: LinearGradient(colors: [startColor, endColor]),
-                  boxShadow: [
-                    BoxShadow(
-                      color: startColor.withOpacity(0.5),
-                      blurRadius: 4,
-                      offset: const Offset(2, 2),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }
